@@ -25,7 +25,7 @@ export const useTodoStore = create<TodoStore>((set) => ({
   messages: [],
   fetchMessages: async () => {
     try {
-      const response = await fetch(API);
+      const response = await fetch(`${API}/${user_id}`);
       const data = await response.json();
       const formattedData = data.map((item: { id: number; text: string }) => ({
         id: item.id,
@@ -39,7 +39,7 @@ export const useTodoStore = create<TodoStore>((set) => ({
 
   addMessage: async (text) => {
     try {
-      const response = await fetch(API, {
+      const response = await fetch(`${API}/${user_id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: text, user_id: user_id }),
@@ -60,7 +60,7 @@ export const useTodoStore = create<TodoStore>((set) => ({
 
   deleteMessage: async (id) => {
     try {
-      const response = await fetch(`${API}/${id}`, {
+      const response = await fetch(`${API}/${user_id}/${id}`, {
         method: "DELETE",
       });
 
