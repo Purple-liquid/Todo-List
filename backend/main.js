@@ -5,41 +5,43 @@ import cors from 'cors'
 const app = express()
 const PORT = process.env.PORT || 3000
 
-app.use(cors());
-app.use(express.json());
+app.use(cors())
+app.use(express.json())
 
 
-app.get('/api/todos', async(req,res) => {
-    try {
-        const result = await pool.query(
-            'SELECT * FROM todos ORDER BY id'
-        )
+app.get('/api/todos/:userId', async(req,res) => {
+  try {
+    const { userId } = req.params
+    
+    const result = await pool.query(
+      'SELECT * FROM todos WHERE user_id = $1 ORDER BY id',
+      [userId]
+    )
 
-        res.json(result.rows)
-    } catch(error) {
-        console.error(error)
-        res.status(500).json({
-            message: "Ошибка на стороне сервера"
-        })
-    }
+    res.json(result.rows)
+  } catch(error) {
+    console.error(error)
+    res.status(500).json({
+      message: "Ошибка на стороне сервера"
+    })
+  }
 })
 
-app.post('/api/todos', async (req, res) => {
+app.post('/api/todos/', async (req, res) => {
     try {
-
+        const { userId } = req.params
         const { title } = req.body;
-
+  
         const result = await pool.query(
             `
-            INSERT INTO todos (text)
-            VALUES ($1)
+            INSERT INTO todos (text, user_id)
+            VALUES ($1,$2)
             RETURNING *
             `,
-            [title]
+            [title, userId]
         );
 
         res.status(201).json(result.rows[0]);
-
     } catch (error) {
 
         console.error(error);
@@ -55,7 +57,7 @@ app.delete('/api/todos/:id', async(req,res) => {
     try {
         const { id } = req.params
         await pool.query(
-            'DELETE FROM todos WHERE id = $1',
+            'DELETE FROM todos WHERE id = $1 AND user_id = $2',
             [id]
         )
         res.json({
@@ -73,4 +75,3 @@ app.delete('/api/todos/:id', async(req,res) => {
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Сервер запущен, порт: http://localhost:${PORT}`)
 })
-
