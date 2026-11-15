@@ -5,13 +5,14 @@ import cors from 'cors'
 const app = express()
 const PORT = process.env.PORT || 3000
 
-app.use(cors());
-app.use(express.json());
+app.use(cors())
+app.use(express.json())
 
 
 app.get('/api/todos/:userId', async(req,res) => {
   try {
-    const { userId } = req.params;
+    const { userId } = req.params
+    
     const result = await pool.query(
       'SELECT * FROM todos WHERE user_id = $1 ORDER BY id',
       [userId]
@@ -28,20 +29,19 @@ app.get('/api/todos/:userId', async(req,res) => {
 
 app.post('/api/todos/', async (req, res) => {
     try {
-
+        const { userId } = req.params
         const { title } = req.body;
-
+  
         const result = await pool.query(
             `
-            INSERT INTO todos (text)
-            VALUES ($1)
+            INSERT INTO todos (text, user_id)
+            VALUES ($1,$2)
             RETURNING *
             `,
-            [title]
+            [title, userId]
         );
 
         res.status(201).json(result.rows[0]);
-
     } catch (error) {
 
         console.error(error);
@@ -57,7 +57,7 @@ app.delete('/api/todos/:id', async(req,res) => {
     try {
         const { id } = req.params
         await pool.query(
-            'DELETE FROM todos WHERE id = $1',
+            'DELETE FROM todos WHERE id = $1 AND user_id = $2',
             [id]
         )
         res.json({
