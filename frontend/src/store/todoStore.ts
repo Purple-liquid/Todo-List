@@ -42,7 +42,7 @@ export const useTodoStore = create<TodoStore>()((set) => ({
       const response = await fetch(API, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: text }),
+        body: JSON.stringify({ title: text, user_id: user_id }),
       });
 
       if (!response.ok) {
