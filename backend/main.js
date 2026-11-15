@@ -8,21 +8,15 @@ const PORT = process.env.PORT || 3000
 app.use(cors())
 app.use(express.json())
 
-app.get('/api/todos', async(req,res) => {
+app.get('/api/todos', async (req, res) => {
   try {
-
-    const result = await pool.query(
-      'SELECT * FROM todos WHERE ORDER BY id',
-    )
-
-    res.json(result.rows)
-  } catch(error) {
-    console.error(error)
-    res.status(500).json({
-      message: "Ошибка на стороне сервера"
-    })
+    const result = await pool.query('SELECT * FROM todos ORDER BY id');
+    res.json(result.rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Ошибка на стороне сервера" });
   }
-})
+});
 
 app.get('/api/todos/:userId', async(req,res) => {
   try {
