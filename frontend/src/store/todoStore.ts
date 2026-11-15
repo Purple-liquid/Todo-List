@@ -12,61 +12,67 @@ interface TodoStore {
   deleteMessage: (id: number) => Promise<void>;
 }
 
-const API = "https://todo-list-03kl.onrender.com/api/todos"
+let user_id: string | null = localStorage.getItem("userId");
 
-export const useTodoStore = create<TodoStore>(
-    (set) => ({
-      messages: [],
-      fetchMessages: async () => {
-        try{
-          const response = await fetch(API)
-          const data = await response.json()
-          const formattedData = data.map((item: any) => ({
-            id: item.id,
-            text: item.text,
-          }))
-          set({ messages: formattedData })
-        } catch (error) {
-          console.error("Ошибка при получении задач:", error)
-        }
-      },
+if (!user_id) {
+  user_id = crypto.randomUUID();
+  localStorage.setItem("userId", user_id);
+}
 
-      addMessage: async (text) => {
-        try {
-          const response = await fetch(API, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ title: text }),
-          });
+const API = `https://todo-list-03kl.onrender.com/api/todos/${user_id}`;
 
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-          }
+export const useTodoStore = create<TodoStore>()((set) => ({
+  messages: [],
+  fetchMessages: async () => {
+    try {
+      const response = await fetch(API);
+      const data = await response.json();
+      const formattedData = data.map((item: { id: number; text: string }) => ({
+        id: item.id,
+        text: item.text,
+      }));
+      set({ messages: formattedData });
+    } catch (error) {
+      console.error("Ошибка при получении задач:", error);
+    }
+  },
 
-          const newTodo = await response.json();
-          set((state) => ({
-            messages: [...state.messages, { id: newTodo.id, text: newTodo.text }],
-          }));
-        } catch (error) {
-          console.error("Ошибка при добавлении задачи:", error);
-        }
-      },
+  addMessage: async (text) => {
+    try {
+      const response = await fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title: text }),
+      });
 
-      deleteMessage: async (id) => {
-        try {
-          const response = await fetch(`${API}/${id}`, {
-            method: "DELETE",
-          });
-          
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-          }
-          
-          set((state) => ({
-            messages: state.messages.filter((i) => i.id !== id),
-          }));
-        } catch (error) {
-          console.error("Ошибка при удалении задачи:", error);
-        }
-      },
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      const newTodo = await response.json();
+      set((state) => ({
+        messages: [...state.messages, { id: newTodo.id, text: newTodo.text }],
+      }));
+    } catch (error) {
+      console.error("Ошибка при добавлении задачи:", error);
+    }
+  },
+
+  deleteMessage: async (id) => {
+    try {
+      const response = await fetch(`${API}/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      set((state) => ({
+        messages: state.messages.filter((i) => i.id !== id),
+      }));
+    } catch (error) {
+      console.error("Ошибка при удалении задачи:", error);
+    }
+  },
 }));

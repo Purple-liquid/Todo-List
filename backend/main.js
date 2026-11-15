@@ -73,4 +73,3 @@ app.delete('/api/todos/:id', async(req,res) => {
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`Сервер запущен, порт: http://localhost:${PORT}`)
 })
-
