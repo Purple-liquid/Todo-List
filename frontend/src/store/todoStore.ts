@@ -19,7 +19,7 @@ if (!user_id) {
   localStorage.setItem("userId", user_id);
 }
 
-const API = `https://todo-list-03kl.onrender.com/api/todos/${user_id}`;
+const API = "https://todo-list-03kl.onrender.com/api/todos/";
 
 export const useTodoStore = create<TodoStore>((set) => ({
   messages: [],
