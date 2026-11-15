@@ -26,7 +26,7 @@ app.get('/api/todos/:userId', async(req,res) => {
   }
 })
 
-app.post('/api/todos/:userId', async (req, res) => {
+app.post('/api/todos/', async (req, res) => {
     try {
 
         const { title } = req.body;
@@ -53,7 +53,7 @@ app.post('/api/todos/:userId', async (req, res) => {
     }
 });
 
-app.delete('/api/todos/:userId/:id', async(req,res) => {
+app.delete('/api/todos/:id', async(req,res) => {
     try {
         const { id } = req.params
         await pool.query(
